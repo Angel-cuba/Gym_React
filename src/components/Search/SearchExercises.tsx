@@ -44,7 +44,7 @@ const SearchExercises = ({ setExercises, bodyPart, setBodyPart }: any) => {
     };
 
     handleSearch();
-  }, [search]);
+  }, [search, setExercises]);
 
   return (
     <Stack alignItems="center" mt="38px" justifyContent="center" p="20px">
