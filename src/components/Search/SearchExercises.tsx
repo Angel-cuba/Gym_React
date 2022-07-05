@@ -38,7 +38,6 @@ const SearchExercises = ({ setExercises, bodyPart, setBodyPart }: any) => {
             exercise.equipment.toLocaleLowerCase().includes(search) ||
             exercise.bodyPart.toLocaleLowerCase().includes(search)
         );
-        setSearch('');
         setExercises(filteredExercises);
       }
     };
