@@ -6,7 +6,6 @@ import HorizontalScrollbar from '../HorizontalScrollbar';
 const SearchExercises = ({ setExercises, bodyPart, setBodyPart }: any) => {
   const [search, setSearch] = React.useState<string>('');
   const [bodyParts, setBodyParts] = React.useState(null);
-  console.log('bodyParts', bodyParts);
 
   const searchValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value.toLocaleLowerCase());

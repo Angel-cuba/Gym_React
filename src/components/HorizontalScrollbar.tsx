@@ -7,7 +7,6 @@ import LeftArrowIcon from '../assets/icons/left-arrow.png';
 import RightArrowIcon from '../assets/icons/right-arrow.png';
 
 const HorizontalScrollbar = ({ data, bodyPart, setBodyPart, setExercises }: any) => {
-  console.log('data', data);
   return (
     <div
       style={{

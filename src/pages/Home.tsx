@@ -8,12 +8,13 @@ import { Exercise } from '../types/exercises.types';
 const Home = () => {
   const [exercises, setExercises] = React.useState<Exercise[] | null>(null);
   const [bodyPart, setBodyPart] = React.useState('back');
+  console.log('bodyParts', bodyPart);
 
   return (
     <Box>
       <HeroBanner />
       <SearchExercises setExercises={setExercises} bodyPart={bodyPart} setBodyPart={setBodyPart} />
-      <ExerciseList setExercises={setExercises} exercises={exercises} setBodyPart={setBodyPart} />
+      <ExerciseList setExercises={setExercises} exercises={exercises} bodyPart={bodyPart} />
     </Box>
   );
 };

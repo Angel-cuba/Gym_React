@@ -3,6 +3,7 @@ import Pagination from '@mui/material/Pagination';
 import { Box, Stack, Typography } from '@mui/material';
 import ExerciseCard from '../Search/Card/Card.Exercise';
 import { Exercise } from '../../types/exercises.types';
+import { exerciseOptions, fetchData } from '../../utils/fetchData';
 
 const ExerciseList = ({ exercises, bodyPart, setExercises }: any) => {
 const [currentPage, setCurrentPage] = React.useState<number>(1);
@@ -18,6 +19,21 @@ const paginate = (e: any, value: any) => {
 
   window.scrollTo({top: 1800, behavior: 'smooth'})
 }
+
+React.useEffect(() => {
+  const fetch = async () => {
+    let exerciseData = [];
+  if(bodyPart === 'back') {
+      exerciseData = await fetchData('https://exercisedb.p.rapidapi.com/exercises', exerciseOptions)
+  } else {
+      exerciseData = await fetchData(`https://exercisedb.p.rapidapi.com/exercises/bodyPart/${bodyPart}`, exerciseOptions)
+  }
+  setExercises(exerciseData);
+  }
+  fetch();
+}, [bodyPart, setExercises]);
+
+
 
 
   return (
