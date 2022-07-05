@@ -4,8 +4,8 @@ import { fetchData, exerciseOptions } from '../../utils/fetchData';
 import HorizontalScrollbar from '../HorizontalScrollbar';
 
 const SearchExercises = ({ setExercises, bodyPart, setBodyPart }: any) => {
-  const [search, setSearch] = React.useState('');
-  const [bodyParts, setBodyParts] = React.useState([]);
+  const [search, setSearch] = React.useState<string>('');
+  const [bodyParts, setBodyParts] = React.useState(null);
   console.log('bodyParts', bodyParts);
 
   const searchValue = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,7 +26,6 @@ const SearchExercises = ({ setExercises, bodyPart, setBodyPart }: any) => {
   React.useEffect(() => {
     const handleSearch = async () => {
       if (search) {
-        console.log('searching');
         const exercises = await fetchData(
           `https://exercisedb.p.rapidapi.com/exercises`,
           exerciseOptions
@@ -69,24 +68,14 @@ const SearchExercises = ({ setExercises, bodyPart, setBodyPart }: any) => {
           placeholder="Search for an exercise"
           type={'text'}
         />
-        {/* <Button
-          className="search-btn"
-          sx={{
-            bgcolor: '#FF2625',
-            color: '#fff',
-            textTransform: 'none',
-            width: { lg: '175px', xs: '90px' },
-            fontSize: { lg: '20px', xs: '14px' },
-            height: '56px',
-            position: 'absolute',
-          }}
-          // onClick={handleSearch}
-        >
-          Search
-        </Button> */}
       </Box>
-      <Box sx={{ position: 'relative', width: '100%', p: '20px'}}>
-        <HorizontalScrollbar data={bodyParts} bodyPart={bodyPart} setBodyPart={setBodyPart}/>
+      <Box sx={{ position: 'relative', width: '100%', p: '20px' }}>
+        <HorizontalScrollbar
+          data={bodyParts}
+          bodyPart={bodyPart}
+          setBodyPart={setBodyPart}
+          setExercises={setExercises}
+        />
       </Box>
     </Stack>
   );

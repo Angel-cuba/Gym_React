@@ -2,7 +2,7 @@ import { Stack, Typography } from '@mui/material';
 import React from 'react';
 import Icon from '../../assets/icons/gym.png';
 
-const Bodypart = ({ item, bodyPart, setBodyPart }: any) => {
+const Bodypart = ({ item, bodyPart, setBodyPart, setExercises }: any) => {
   return (
     <Stack
       //  type="button"
@@ -11,6 +11,7 @@ const Bodypart = ({ item, bodyPart, setBodyPart }: any) => {
       className="bodyPart-card"
       onClick={() => {
         setBodyPart(item);
+        // setExercises(item)
         window.scrollTo({ top: 1800, left: 100, behavior: 'smooth' });
       }}
     >

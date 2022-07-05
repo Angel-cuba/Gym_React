@@ -3,9 +3,10 @@ import React from 'react';
 import ExerciseList from '../components/List/ExerciseList';
 import HeroBanner from '../components/Banner/HeroBanner';
 import SearchExercises from '../components/Search/SearchExercises';
+import { Exercise } from '../types/exercises.types';
 
 const Home = () => {
-  const [exercises, setExercises] = React.useState([]);
+  const [exercises, setExercises] = React.useState<Exercise[] | null>(null);
   const [bodyPart, setBodyPart] = React.useState('back');
 
   return (
