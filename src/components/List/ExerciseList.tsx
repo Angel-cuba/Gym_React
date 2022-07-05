@@ -5,7 +5,21 @@ import ExerciseCard from '../Search/Card/Card.Exercise';
 import { Exercise } from '../../types/exercises.types';
 
 const ExerciseList = ({ exercises, bodyPart, setExercises }: any) => {
-  console.log('exercises', exercises);
+const [currentPage, setCurrentPage] = React.useState<number>(1);
+
+const exercisePerPage = 12;
+const indexOfLastExercise = currentPage * exercisePerPage;
+const indexOfFirstExercise = indexOfLastExercise - exercisePerPage;
+const currentExercises = exercises.slice(indexOfFirstExercise, indexOfLastExercise);
+
+const paginate = (e: any, value: any) => {
+  // setCurrentPage(Number(e.target.value));
+  setCurrentPage(value);
+
+  window.scrollTo({top: 1800, behavior: 'smooth'})
+}
+
+
   return (
     <Box id="exercises" sx={{ mt: { lg: '110px', xs: '30px' } }} mt={'50px'} p={'20px'}>
       <Typography variant="h3" mb="45px">
@@ -17,9 +31,22 @@ const ExerciseList = ({ exercises, bodyPart, setExercises }: any) => {
         flexWrap="wrap"
         justifyContent="center"
       >
-        {exercises.map((exercise: Exercise, index: number) => {
-          return <ExerciseCard key={index} exercise={exercise}/>;
+        {currentExercises?.map((exercise: Exercise, index: number) => {
+          return <ExerciseCard key={index} exercise={exercise} />;
         })}
+      </Stack>
+      <Stack mt="100px" alignItems="center">
+        {exercises?.length > 10 && (
+          <Pagination
+            color="standard"
+            shape="rounded"
+            count={Math.ceil(exercises.length / exercisePerPage)}
+            defaultPage={1}
+            page={currentPage}
+            onChange={ paginate }
+            size="large"
+          />
+        )}
       </Stack>
     </Box>
   );
