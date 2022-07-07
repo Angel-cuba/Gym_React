@@ -35,7 +35,7 @@ const ExerciseDetails = () => {
       {/* Details */}
       <Details exerciseDetails={exerciseDetails} />
       {/* Videos */}
-      <Videos videos={videos}/>
+      <Videos videos={videos} name={exerciseDetails?.name}/>
       {/* Others */}
       <Similars />
     </Box>
