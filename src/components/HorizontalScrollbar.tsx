@@ -5,8 +5,20 @@ import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
 
 import LeftArrowIcon from '../assets/icons/left-arrow.png';
 import RightArrowIcon from '../assets/icons/right-arrow.png';
+import ExerciseCard from './Search/Card/Card.Exercise';
 
-const HorizontalScrollbar = ({ data, bodyPart, setBodyPart, setExercises }: any) => {
+const HorizontalScrollbar = ({
+  data,
+  bodyPart,
+  setBodyPart,
+  setExercises,
+  isBodyParts,
+  similarsTarget,
+  equipment,
+}: any) => {
+  console.log('data', data);
+  console.log('similarsTarget', similarsTarget);
+  console.log('equipment', equipment);
   return (
     <div
       style={{
@@ -16,24 +28,35 @@ const HorizontalScrollbar = ({ data, bodyPart, setBodyPart, setExercises }: any)
         flexWrap: 'wrap',
         width: '100%',
         height: '100%',
-        // overflow: 'hidden',
         position: 'relative',
       }}
     >
-      {data?.map((item: any, index: number) => (
+      {(
+        data?.slice(0, data.length > 11 ? 12 : data.length) 
+        //||
+        // similarsTarget?.slice(0, similarsTarget.length > 11 ? 12 : similarsTarget.length) ||
+        // equipment
+      )?.map((item: any, index: number) => (
         <Box
           key={index}
-          // itemId={item.id || item}
           title={item.id || item}
           m="0 20px"
           p="10px"
           style={{
-            backgroundColor: '#3474e2',
             borderRadius: '2px',
             borderTop: bodyPart === item ? '2px solid #ff2625' : ' ',
           }}
         >
-          <Bodypart item={item} bodyPart={bodyPart} setBodyPart={setBodyPart} setExercises={setExercises}/>
+          {isBodyParts ? (
+            <Bodypart
+              item={item}
+              bodyPart={bodyPart}
+              setBodyPart={setBodyPart}
+              setExercises={setExercises}
+            />
+          ) : (
+            <ExerciseCard exercise={item} />
+          )}
         </Box>
       ))}
     </div>
