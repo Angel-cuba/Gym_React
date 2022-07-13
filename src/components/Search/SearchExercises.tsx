@@ -57,15 +57,19 @@ const SearchExercises = ({ setExercises, bodyPart, setBodyPart }: any) => {
       <Box position="relative" alignItems="center">
         <TextField
           sx={{
-            input: { fontWeight: '700', borderRadius: '5px', border: 'none' },
+            input: { fontWeight: '700', borderRadius: '5px', border: 'none'},
             width: { lg: '900px', xs: '350px' },
-            backgroundColor: '#fff',
-            borderRadius: '40px',
+            backgroundColor: '#ffffec5a',
+            color: '#3A1212',
+            borderTopLeftRadius: '6px',
+            borderTopRightRadius: '6px',
+            outline: 'none',
           }}
           value={search}
           onChange={(e) => searchValue(e as any)}
-          placeholder="Search for an exercise"
+          placeholder="Search for some exercises"
           type={'text'}
+          variant="filled"
         />
       </Box>
       <Box sx={{ position: 'relative', width: '100%', p: '20px' }}>
