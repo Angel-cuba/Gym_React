@@ -31,12 +31,12 @@ const Details = ({ exerciseDetails }: any) => {
           />
           <Stack sx={{ gap: { lg: '35px', xs: '20px' } }}>
             <Typography variant="h3">
-              {exerciseDetails.name[0].toUpperCase() + exerciseDetails.name.slice(1)}
+              {exerciseDetails.name[0].toUpperCase() + exerciseDetails.name?.slice(1)}
             </Typography>
             <Typography variant="h6" style={{ maxWidth: '500px' }}>
               Exercises keep you strong and fit.
               <br /> We have a lot of exercises to help you get started. <br />
-              {exerciseDetails.name[0].toUpperCase() + exerciseDetails.name.slice(1)} is one of the
+              {exerciseDetails.name[0].toUpperCase() + exerciseDetails.name?.slice(1)} is one of the
               most popular exercise to target your {exerciseDetails.target}. It will help you to
               build your {exerciseDetails.bodyPart} muscles, improve your mood and gain a lot of
               energy.
