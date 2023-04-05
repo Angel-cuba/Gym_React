@@ -13,9 +13,6 @@ const HorizontalScrollbar = ({
   similarsTarget,
   equipment,
 }: any) => {
-  console.log('data', data);
-  console.log('similarsTarget', similarsTarget);
-  console.log('equipment', equipment);
   return (
     <div
       style={{
