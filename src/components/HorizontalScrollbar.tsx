@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import Bodypart from './BodyParts/Bodypart';
 
 import ExerciseCard from './Search/Card/Card.Exercise';
+import Loader from './Loader';
 
 const HorizontalScrollbar = ({
   data,
@@ -25,8 +26,8 @@ const HorizontalScrollbar = ({
         position: 'relative',
       }}
     >
-      {!data || Array.isArray(data)
-        ? null
+      {!data
+        ? <Loader />
         : data?.slice(0, data.length > 11 ? 12 : data.length)?.map((item: any, index: number) => (
             <Box
               key={index}
