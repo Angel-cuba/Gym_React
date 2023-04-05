@@ -13,7 +13,6 @@ const Similars = ({ similarsTarget, equipment }: any) => {
         {!similarsTarget?.length ? (
           <Loader />
         ) : (
-          // <HorizontalScrollbar similarsTarget={similarsTarget} />
           <HorizontalScrollbar data={similarsTarget} />
 
         )}

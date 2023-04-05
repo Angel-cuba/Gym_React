@@ -2,11 +2,11 @@ import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { Box } from '@mui/material';
 
-import './App.css';
-import Home from './pages/Home';
 import ExerciseDetails from './pages/ExerciseDetails';
-import Footer from './components/Footer/Footer';
 import Navbar from './components/Navbar/Navbar';
+import Home from './pages/Home';
+import Footer from './components/Footer/Footer';
+import './App.css';
 
 function App() {
   return <Box width="400px" sx={{width: {xl: '1488px'}}} m="auto">
