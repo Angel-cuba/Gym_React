@@ -25,7 +25,7 @@ const HorizontalScrollbar = ({
         position: 'relative',
       }}
     >
-      {!data
+      {!data || Array.isArray(data)
         ? null
         : data?.slice(0, data.length > 11 ? 12 : data.length)?.map((item: any, index: number) => (
             <Box
