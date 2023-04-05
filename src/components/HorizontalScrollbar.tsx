@@ -25,7 +25,9 @@ const HorizontalScrollbar = ({
         position: 'relative',
       }}
     >
-      {data
+      {
+        !data ? null : (
+          data
         ?.slice(0, data.length > 11 ? 12 : data.length)
         ?.map((item: any, index: number) => (
           <Box
@@ -49,7 +51,9 @@ const HorizontalScrollbar = ({
               <ExerciseCard exercise={item} />
             )}
           </Box>
-        ))}
+        ))
+        )
+      }
     </div>
   );
 };
