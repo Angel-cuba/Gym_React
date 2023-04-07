@@ -1,3 +1,18 @@
+# Getting Started with Create React App
+
+###### This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+In the project directory, you can run:
+
+### `npm start`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
+#
+
 # Welcome view
 
 ![Captura de pantalla 2023-04-05 a las 12 59 11](https://user-images.githubusercontent.com/69958243/230643523-12bd6514-0ac7-4a3f-8f8c-d3b49008b036.png)
