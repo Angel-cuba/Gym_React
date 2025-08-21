@@ -1,34 +1,41 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Stack, Button, Typography } from '@mui/material';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Stack, Button, Typography } from "@mui/material";
+import { Exercise } from "../../../types/exercises.types";
 
-const ExerciseCard = ({ exercise }: any) => {
+/**
+ * A component to render a card for an exercise.
+ *
+ * @param {{ exercise: Exercise }} props - The exercise data to render.
+ * @returns {JSX.Element} - The rendered card.
+ */
+const ExerciseCard = ({ exercise }: { exercise: Exercise }): JSX.Element => {
   return (
     <Link className="exercise-card" to={`/exercise/${exercise.id}`}>
       <img src={exercise.gifUrl} alt={exercise.name} loading="lazy" />
       <Stack direction="row">
         <Button
           sx={{
-            marginLeft: '21px',
-            color: 'white',
-            backgroundColor: '#ffa9a9',
-            fontSize: '14px',
-            borderRadius: '20px',
-            textTransform: 'capitalize',
-            padding: '5px',
+            marginLeft: "21px",
+            color: "white",
+            backgroundColor: "#ffa9a9",
+            fontSize: "14px",
+            borderRadius: "20px",
+            textTransform: "capitalize",
+            padding: "5px",
           }}
         >
           {exercise.bodyPart}
         </Button>
         <Button
           sx={{
-            marginLeft: '21px',
-            color: 'white',
-            backgroundColor: '#fcc757',
-            fontSize: '14px',
-            borderRadius: '20px',
-            textTransform: 'capitalize',
-            padding: '5px',
+            marginLeft: "21px",
+            color: "white",
+            backgroundColor: "#fcc757",
+            fontSize: "14px",
+            borderRadius: "20px",
+            textTransform: "capitalize",
+            padding: "5px",
           }}
         >
           {exercise.target}

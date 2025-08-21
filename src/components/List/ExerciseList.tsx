@@ -1,31 +1,52 @@
-import React from 'react';
-import Pagination from '@mui/material/Pagination';
-import { Box, Stack, Typography } from '@mui/material';
-import ExerciseCard from '../Search/Card/Card.Exercise';
-import { Exercise } from '../../types/exercises.types';
-import { exerciseOptions, fetchData } from '../../utils/fetchData';
+import React from "react";
+import Pagination from "@mui/material/Pagination";
+import { Box, Stack, Typography } from "@mui/material";
+import ExerciseCard from "../Search/Card/Card.Exercise";
+import { Exercise } from "../../types/exercises.types";
+import { exerciseOptions, fetchData } from "../../utils/fetchData";
 
-const ExerciseList = ({ exercises, bodyPart, setExercises }: any) => {
+/**
+ * A component to display a list of exercises.
+ *
+ * @param {{ exercises: Exercise[]; bodyPart: string; setExercises: (exercises: Exercise[]) => void; }} props
+ * @returns {JSX.Element}
+ */
+const ExerciseList = ({
+  exercises,
+  bodyPart,
+  setExercises,
+}: {
+  exercises: Exercise[];
+  bodyPart: string;
+  setExercises: (exercises: Exercise[]) => void;
+}): JSX.Element => {
   const [currentPage, setCurrentPage] = React.useState<number>(1);
 
   const exercisePerPage = 12;
   const indexOfLastExercise = currentPage * exercisePerPage;
   const indexOfFirstExercise = indexOfLastExercise - exercisePerPage;
-  const currentExercises = exercises && exercises?.slice( indexOfFirstExercise, indexOfLastExercise
-  );
+  const currentExercises = Array.isArray(exercises)
+    ? exercises.slice(indexOfFirstExercise, indexOfLastExercise)
+    : [];
 
-  const paginate = (e: any, value: any) => {
+  /**
+   * Handles pagination by changing the current page state and scrolling to the top.
+   *
+   * @param {React.ChangeEvent<unknown>, value: number} e - The pagination event
+   * @param {number} value - The new current page
+   */
+  const paginate = (e: React.ChangeEvent<unknown>, value: number): void => {
     setCurrentPage(value);
 
-    window.scrollTo({ top: 1800, behavior: 'smooth' });
+    window.scrollTo({ top: 1800, behavior: "smooth" });
   };
 
   React.useEffect(() => {
     const fetch = async () => {
-      let exerciseData = [];
-      if (bodyPart === 'back') {
+      let exerciseData: Exercise[] = [];
+      if (bodyPart === "back") {
         exerciseData = await fetchData(
-          'https://exercisedb.p.rapidapi.com/exercises',
+          "https://exercisedb.p.rapidapi.com/exercises",
           exerciseOptions
         );
       } else {
@@ -40,13 +61,18 @@ const ExerciseList = ({ exercises, bodyPart, setExercises }: any) => {
   }, [bodyPart, setExercises]);
 
   return (
-    <Box id="exercises" sx={{ mt: { lg: '110px', xs: '30px' } }} mt={'50px'} p={'20px'}>
+    <Box
+      id="exercises"
+      sx={{ mt: { lg: "110px", xs: "30px" } }}
+      mt={"50px"}
+      p={"20px"}
+    >
       <Typography variant="h3" mb="45px">
         Showing results
       </Typography>
       <Stack
         direction="row"
-        sx={{ gap: { lg: '110px', xs: '50px' } }}
+        sx={{ gap: { lg: "110px", xs: "50px" } }}
         flexWrap="wrap"
         justifyContent="center"
       >

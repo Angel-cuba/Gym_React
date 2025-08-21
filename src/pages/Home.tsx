@@ -1,19 +1,27 @@
-import { Box } from '@mui/material';
-import React from 'react';
-import ExerciseList from '../components/List/ExerciseList';
-import HeroBanner from '../components/Banner/HeroBanner';
-import SearchExercises from '../components/Search/SearchExercises';
-import { Exercise } from '../types/exercises.types';
+import { Box } from "@mui/material";
+import React from "react";
+import ExerciseList from "../components/List/ExerciseList";
+import HeroBanner from "../components/Banner/HeroBanner";
+import SearchExercises from "../components/Search/SearchExercises";
+import { Exercise } from "../types/exercises.types";
 
 const Home = () => {
   const [exercises, setExercises] = React.useState<Exercise[] | null>(null);
-  const [bodyPart, setBodyPart] = React.useState('back');
+  const [bodyPart, setBodyPart] = React.useState("back");
 
   return (
     <Box>
       <HeroBanner />
-      <SearchExercises setExercises={setExercises} bodyPart={bodyPart} setBodyPart={setBodyPart} />
-      <ExerciseList setExercises={setExercises} exercises={exercises} bodyPart={bodyPart} />
+      <SearchExercises
+        setExercises={setExercises}
+        bodyPart={bodyPart}
+        setBodyPart={setBodyPart}
+      />
+      <ExerciseList
+        setExercises={setExercises}
+        exercises={exercises ?? []}
+        bodyPart={bodyPart}
+      />
     </Box>
   );
 };
