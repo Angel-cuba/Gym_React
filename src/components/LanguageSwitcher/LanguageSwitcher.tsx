@@ -7,7 +7,7 @@ const LanguageSwitcher = (): JSX.Element => {
   const currentLanguage = i18n.language as LanguageCode;
 
   return (
-    <div className="language-switcher" aria-label={t("language.label")}>
+    <div className="language-switcher" aria-label={t("language.label") ?? undefined}>
       {languages.map((language) => (
         <button
           key={language.code}

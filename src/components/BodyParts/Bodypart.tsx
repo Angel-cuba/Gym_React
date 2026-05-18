@@ -1,13 +1,8 @@
-import React from "react";
-import { Stack, Typography } from "@mui/material";
-import { useTranslation } from "react-i18next";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { MuscleIcon } from "./MuscleIcons";
+import { bodyPartCardImages } from "../../data/fallbackImages";
 
-/**
- * A component that renders a body part card.
- *
- * @param {{ item: string, bodyPart: string, setBodyPart: (bodyPart: string) => void }} props
- * @returns {JSX.Element}
- */
 const BodyPart = ({
   item,
   bodyPart,
@@ -17,30 +12,53 @@ const BodyPart = ({
   bodyPart: string;
   setBodyPart: (bodyPart: string) => void;
 }): JSX.Element => {
-  const { t } = useTranslation();
-  const label = item === "all" ? t("exercises.all") : item;
+  const isActive = bodyPart === item;
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const bgUrl = bodyPartCardImages[item.toLowerCase()];
+  const showPhoto = !!bgUrl && imgLoaded && !imgError;
 
   return (
-    <Stack
-      component="button"
-      alignItems="center"
-      justifyContent="center"
-      className={`bodyPart-card ${bodyPart === item ? "active" : ""}`}
+    <motion.button
+      className={`bodyPart-card ${isActive ? "active" : ""}`}
       onClick={() => {
         setBodyPart(item);
         document.getElementById("exercises")?.scrollIntoView({ behavior: "smooth" });
       }}
+      whileHover={{ y: -5, scale: 1.03 }}
+      whileTap={{ scale: 0.96 }}
+      transition={{ type: "spring", stiffness: 380, damping: 22 }}
     >
-      <span className="bodyPart-icon" aria-hidden="true">
-        {item === "all" ? "A" : item.charAt(0)}
-      </span>
-      <Typography
-        className="bodyPart-label"
-        textTransform="capitalize"
-      >
-        {label}
-      </Typography>
-    </Stack>
+      {/* Preload background image */}
+      {bgUrl && !imgError && (
+        <img
+          src={bgUrl}
+          alt=""
+          aria-hidden
+          style={{ display: "none" }}
+          onLoad={() => setImgLoaded(true)}
+          onError={() => setImgError(true)}
+        />
+      )}
+
+      {/* Photo background */}
+      {showPhoto && (
+        <div
+          className="bodyPart-bg-photo"
+          style={{ backgroundImage: `url(${bgUrl})` }}
+        />
+      )}
+
+      {/* Gradient overlay */}
+      <div className={`bodyPart-overlay ${showPhoto ? "bodyPart-overlay--photo" : ""}`} />
+
+      {/* SVG muscle illustration */}
+      <div className={`bodyPart-svg-wrap ${showPhoto ? "bodyPart-svg-wrap--photo" : ""}`}>
+        <MuscleIcon name={item} active={isActive || showPhoto} />
+      </div>
+
+      <span className="bodyPart-label">{item}</span>
+    </motion.button>
   );
 };
 

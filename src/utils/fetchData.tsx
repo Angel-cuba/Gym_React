@@ -10,6 +10,21 @@ const buildYoutubeHeaders = (): HeadersInit => {
   return headers;
 };
 
+const buildExerciseHeaders = (): HeadersInit => {
+  const headers: Record<string, string> = {
+    "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
+  };
+  if (process.env.REACT_APP_RAPID_API_KEY) {
+    headers["X-RapidAPI-Key"] = process.env.REACT_APP_RAPID_API_KEY;
+  }
+  return headers;
+};
+
+export const exerciseOptions: RequestInit = {
+  method: "GET",
+  headers: buildExerciseHeaders(),
+};
+
 export const youtubeOptions: RequestInit = {
   method: "GET",
   headers: buildYoutubeHeaders(),
