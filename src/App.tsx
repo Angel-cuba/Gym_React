@@ -1,19 +1,19 @@
-import React, { Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import { Box } from '@mui/material';
+import React, { Suspense } from "react";
+import { Route, Routes } from "react-router-dom";
+import { Box } from "@mui/material";
 
-import Navbar from './components/Navbar/Navbar';
-import Footer from './components/Footer/Footer';
-import './App.css';
+import Navbar from "./components/Navbar/Navbar";
+import Footer from "./components/Footer/Footer";
+import "./App.css";
 
-const Home = React.lazy(() => import('./pages/Home'));
-const ExerciseDetails = React.lazy(() => import('./pages/ExerciseDetails'));
+const Home = React.lazy(() => import("./pages/Home"));
+const ExerciseDetails = React.lazy(() => import("./pages/ExerciseDetails"));
 
 function App() {
   return (
-    <Box width="400px" sx={{ width: { xl: '1488px' } }} m="auto">
+    <Box className="app-shell">
       <Navbar />
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="page-loading">Loading workouts...</div>}>
         <Routes>
           <Route path="" element={<Home />} />
           <Route path="/" element={<Home />} />

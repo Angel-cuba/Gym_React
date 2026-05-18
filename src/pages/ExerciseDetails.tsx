@@ -6,7 +6,14 @@ import Similars from "../components/Details/Similars";
 import Videos from "../components/Details/Videos";
 import { Exercise, Video } from "../types/exercises.types";
 import { exerciseOptions, fetchData, youtubeOptions } from "../utils/fetchData";
-// Remove import for Video type if not needed or already defined elsewhere
+import {
+  fallbackExercises,
+  getFallbackExerciseById,
+} from "../data/fallbackExercises";
+
+type YoutubeSearchResponse = {
+  contents?: Video[];
+};
 
 const ExerciseDetails = () => {
   const { id } = useParams();
@@ -24,32 +31,47 @@ const ExerciseDetails = () => {
       const fetch = "https://exercisedb.p.rapidapi.com/exercises";
       const ytUrl = "https://youtube-search-and-download.p.rapidapi.com";
 
-      // Fetching details
-      const exerciseDetailData = await fetchData(
+      const exerciseDetailData = await fetchData<Exercise>(
         `${fetch}/exercise/${id}`,
         exerciseOptions
       );
-      setExercisesDetails(exerciseDetailData);
+      const safeExercise = exerciseDetailData ?? getFallbackExerciseById(id);
+      setExercisesDetails(safeExercise);
 
-      // Fetching videos
-      const exerciseYoutubeData = await fetchData(
-        `${ytUrl}/search?query=${exerciseDetailData?.name}`,
+      if (!safeExercise) {
+        setVideos([]);
+        setSimilarsTarget(fallbackExercises);
+        setEquipment(fallbackExercises);
+        return;
+      }
+
+      const exerciseYoutubeData = await fetchData<YoutubeSearchResponse>(
+        `${ytUrl}/search?query=${safeExercise.name}`,
         youtubeOptions
       );
-      setVideos(exerciseYoutubeData.contents);
+      setVideos(exerciseYoutubeData?.contents ?? []);
 
-      // Fetching similars
-      const similarsData = await fetchData(
-        `${fetch}/target/${exerciseDetailData?.target}`,
+      const similarsData = await fetchData<Exercise[]>(
+        `${fetch}/target/${safeExercise.target}`,
         exerciseOptions
       );
-      setSimilarsTarget(similarsData);
-      //Fetching equipment
-      const equipmentData = await fetchData(
-        `${fetch}/equipment/${exerciseDetailData?.equipment}`,
+      setSimilarsTarget(
+        similarsData?.length
+          ? similarsData
+          : fallbackExercises.filter((exercise) => exercise.target === safeExercise.target)
+      );
+
+      const equipmentData = await fetchData<Exercise[]>(
+        `${fetch}/equipment/${safeExercise.equipment}`,
         exerciseOptions
       );
-      setEquipment(equipmentData);
+      setEquipment(
+        equipmentData?.length
+          ? equipmentData
+          : fallbackExercises.filter(
+              (exercise) => exercise.equipment === safeExercise.equipment
+            )
+      );
     };
 
     exerciseDbUrl();

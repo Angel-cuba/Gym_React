@@ -17,21 +17,17 @@ const Videos = ({
   name: string;
 }): JSX.Element => {
   return (
-    <Box sx={{ marginTop: { lg: "200px", xs: "20px" } }} p="20px">
-      <Typography variant="h4" mb="33px" align="center">
-        Watch{" "}
-        <span style={{ color: "#ff2625", textTransform: "capitalize" }}>
-          {name}
-        </span>{" "}
-        exercise on YouTube
+    <Box component="section" className="video-section">
+      <Typography className="section-title" align="center">
+        Videos de {name || "este ejercicio"}
       </Typography>
-      <Stack
-        justifyContent="space-around"
-        flexWrap={"wrap"}
-        alignItems="center"
-        sx={{ flexDirection: { lg: "row" }, gap: { lg: "110px", xs: "0" } }}
-      >
-        {videos?.slice(0, 6).map((video: Video, index: number) => (
+      {!videos?.length ? (
+        <Typography className="empty-state" textAlign="center">
+          No hay videos disponibles por ahora.
+        </Typography>
+      ) : (
+        <Stack className="video-grid">
+          {videos?.slice(0, 6).map((video: Video, index: number) => (
           <a
             key={index}
             className="exercise-video"
@@ -49,8 +45,9 @@ const Videos = ({
               </Typography>
             </Box>
           </a>
-        ))}
-      </Stack>
+          ))}
+        </Stack>
+      )}
     </Box>
   );
 };

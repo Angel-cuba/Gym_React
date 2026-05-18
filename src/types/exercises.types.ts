@@ -5,6 +5,8 @@ export type Exercise = {
   gifUrl: string;
   equipment: string;
   target: string;
+  instructions?: string[];
+  secondaryMuscles?: string[];
 };
 export interface Video {
   videoId: string;

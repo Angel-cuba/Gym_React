@@ -1,7 +1,6 @@
 import { Box, Stack, Typography } from "@mui/material";
 import React from "react";
 import HorizontalScrollbar from "../HorizontalScrollbar";
-import Loader from "../Loader";
 import { Exercise } from "../../types/exercises.types";
 
 /**
@@ -18,14 +17,12 @@ const Similars = ({
   equipment: Exercise[] | null;
 }): JSX.Element => {
   return (
-    <Box sx={{ mt: { lg: "100px", xs: "0" } }}>
-      <Typography variant="h4" align="center" mb="13px">
-        {`Similar exercises to ${similarsTarget && similarsTarget[0]?.target}`}
+    <Box component="section" className="similar-section">
+      <Typography className="section-title" align="center">
+        Ejercicios similares
       </Typography>
-      <Stack direction="row" sx={{ p: "2px", position: "relative" }}>
-        {!similarsTarget?.length ? (
-          <Loader />
-        ) : (
+      <Stack className="similar-block">
+        {similarsTarget?.length ? (
           <HorizontalScrollbar
             data={similarsTarget}
             bodyPart=""
@@ -33,15 +30,17 @@ const Similars = ({
             setExercises={() => {}}
             isBodyParts={false}
           />
+        ) : (
+          <Typography className="empty-state" textAlign="center">
+            No hay ejercicios similares disponibles.
+          </Typography>
         )}
       </Stack>
-      <Stack direction="column" sx={{ p: "2px", position: "relative" }}>
-        <Typography variant="h6" align="center" mb="13px">
-          {`Equipment: ${equipment && equipment[0]?.equipment}`}
+      <Stack className="similar-block">
+        <Typography className="eyebrow" align="center">
+          Mismo equipo
         </Typography>
-        {!equipment?.length ? (
-          <Loader />
-        ) : (
+        {equipment?.length ? (
           <HorizontalScrollbar
             data={equipment}
             bodyPart=""
@@ -49,6 +48,10 @@ const Similars = ({
             setExercises={() => {}}
             isBodyParts={false}
           />
+        ) : (
+          <Typography className="empty-state" textAlign="center">
+            No hay alternativas con este equipo.
+          </Typography>
         )}
       </Stack>
     </Box>

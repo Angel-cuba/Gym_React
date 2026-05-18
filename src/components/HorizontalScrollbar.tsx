@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 
 import ExerciseCard from "./Search/Card/Card.Exercise";
 import Loader from "./Loader";
-import BodyPart from "./BodyParts/BodyPart";
+import BodyPart from "./BodyParts/Bodypart";
 import { Exercise } from "../types/exercises.types";
 
 /**
@@ -18,8 +18,6 @@ const HorizontalScrollbar = ({
   setBodyPart,
   setExercises,
   isBodyParts,
-  similarsTarget,
-  equipment,
 }: {
   data: Exercise[] | string[];
   bodyPart: string;
@@ -30,17 +28,7 @@ const HorizontalScrollbar = ({
   equipment?: boolean;
 }): JSX.Element => {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-around",
-        flexWrap: "wrap",
-        width: "100%",
-        height: "100%",
-        position: "relative",
-      }}
-    >
+    <Box className={isBodyParts ? "body-part-list" : "exercise-grid"}>
       {!data ? (
         <Loader />
       ) : Array.isArray(data) ? (
@@ -50,12 +38,7 @@ const HorizontalScrollbar = ({
             <Box
               key={index}
               title={typeof item === "object" && "id" in item ? item.id : item}
-              m="0 20px"
-              p="10px"
-              style={{
-                borderRadius: "2px",
-                borderTop: bodyPart === item ? "2px solid #ff2625" : " ",
-              }}
+              className={isBodyParts ? "body-part-item" : "exercise-grid-item"}
             >
               {isBodyParts ? (
                 <BodyPart
@@ -69,7 +52,7 @@ const HorizontalScrollbar = ({
             </Box>
           ))
       ) : null}
-    </div>
+    </Box>
   );
 };
 

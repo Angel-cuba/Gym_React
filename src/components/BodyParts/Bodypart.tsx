@@ -1,6 +1,5 @@
 import React from "react";
 import { Stack, Typography } from "@mui/material";
-import Icon from "../../assets/icons/gym.png";
 
 /**
  * A component that renders a body part card.
@@ -19,32 +18,21 @@ const BodyPart = ({
 }): JSX.Element => {
   return (
     <Stack
-      //  type="button"
+      component="button"
       alignItems="center"
       justifyContent="center"
-      className="bodyPart-card"
+      className={`bodyPart-card ${bodyPart === item ? "active" : ""}`}
       onClick={() => {
         setBodyPart(item);
-        window.scrollTo({ top: 1800, left: 100, behavior: "smooth" });
+        document.getElementById("exercises")?.scrollIntoView({ behavior: "smooth" });
       }}
     >
-      <img
-        src={Icon}
-        alt="dumbbell"
-        style={{
-          backgroundColor: bodyPart === item ? "#f9979712" : "#fff",
-          borderBottomLeftRadius: "2px",
-          width: "50px",
-          height: "60px",
-          cursor: "pointer",
-          padding: "2px",
-          boxShadow: bodyPart === item ? "0px 0px 5px 1px #ff000050" : " ",
-        }}
-      />
+      <span className="bodyPart-icon" aria-hidden="true">
+        {item === "all" ? "A" : item.charAt(0)}
+      </span>
       <Typography
-        fontWeight="bold"
-        color={bodyPart === item ? "#ff2625" : "#501a1a"}
-        textTransform="uppercase"
+        className="bodyPart-label"
+        textTransform="capitalize"
       >
         {item}
       </Typography>

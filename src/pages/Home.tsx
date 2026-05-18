@@ -3,11 +3,13 @@ import React from "react";
 import ExerciseList from "../components/List/ExerciseList";
 import HeroBanner from "../components/Banner/HeroBanner";
 import SearchExercises from "../components/Search/SearchExercises";
+import { fallbackExercises } from "../data/fallbackExercises";
 import { Exercise } from "../types/exercises.types";
 
 const Home = () => {
-  const [exercises, setExercises] = React.useState<Exercise[] | null>(null);
-  const [bodyPart, setBodyPart] = React.useState("back");
+  const [exercises, setExercises] =
+    React.useState<Exercise[]>(fallbackExercises);
+  const [bodyPart, setBodyPart] = React.useState("all");
 
   return (
     <Box>
@@ -19,7 +21,7 @@ const Home = () => {
       />
       <ExerciseList
         setExercises={setExercises}
-        exercises={exercises ?? []}
+        exercises={exercises}
         bodyPart={bodyPart}
       />
     </Box>

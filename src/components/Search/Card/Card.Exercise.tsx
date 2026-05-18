@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Stack, Button, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { Exercise } from "../../../types/exercises.types";
 
 /**
@@ -10,44 +10,32 @@ import { Exercise } from "../../../types/exercises.types";
  * @returns {JSX.Element} - The rendered card.
  */
 const ExerciseCard = ({ exercise }: { exercise: Exercise }): JSX.Element => {
+  const initials = exercise.name
+    .split(" ")
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+
   return (
     <Link className="exercise-card" to={`/exercise/${exercise.id}`}>
-      <img src={exercise.gifUrl} alt={exercise.name} loading="lazy" />
-      <Stack direction="row">
-        <Button
-          sx={{
-            marginLeft: "21px",
-            color: "white",
-            backgroundColor: "#ffa9a9",
-            fontSize: "14px",
-            borderRadius: "20px",
-            textTransform: "capitalize",
-            padding: "5px",
-          }}
-        >
+      <Box className="exercise-media">
+        {exercise.gifUrl ? (
+          <img src={exercise.gifUrl} alt={exercise.name} loading="lazy" />
+        ) : (
+          <span>{initials}</span>
+        )}
+      </Box>
+      <Stack direction="row" className="exercise-tags">
+        <span>
           {exercise.bodyPart}
-        </Button>
-        <Button
-          sx={{
-            marginLeft: "21px",
-            color: "white",
-            backgroundColor: "#fcc757",
-            fontSize: "14px",
-            borderRadius: "20px",
-            textTransform: "capitalize",
-            padding: "5px",
-          }}
-        >
+        </span>
+        <span>
           {exercise.target}
-        </Button>
+        </span>
       </Stack>
       <Typography
-        ml="21px"
-        color="#000"
-        fontSize="18px"
-        fontWeight="bold"
-        mt="11px"
-        pb="10px"
+        className="exercise-title"
         textTransform="capitalize"
       >
         {exercise.name}

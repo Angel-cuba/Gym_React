@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import HeroBannerImage from "../../assets/images/banner.png";
 
 /**
@@ -9,46 +9,37 @@ import HeroBannerImage from "../../assets/images/banner.png";
  */
 const HeroBanner = (): JSX.Element => {
   return (
-    <Box
-      sx={{ mt: { lg: "212px", xs: "70px" }, ml: { sm: "50px" } }}
-      position="relative"
-      p="20px"
-    >
-      <Typography color="#FF2625" fontWeight="600" fontSize="26px">
-        Fitness Club
-      </Typography>
-      <Typography
-        fontWeight="700"
-        sx={{ fontSize: { lg: "44px", xs: "40px" } }}
-        mb="23px"
-        mt="30px"
-      >
-        Sweat, Smile <br /> and Repeat
-      </Typography>
-      <Typography fontSize="22px" lineHeight="35px" mb={3}>
-        Checkout the most popular and effective exercises
-      </Typography>
-      <Button
-        variant="contained"
-        color="error"
-        href="#exercises"
-        sx={{ backgroundColor: "#ff2625", padding: "10px" }}
-      >
-        Explore exercises
-      </Button>
-      <Typography
-        fontWeight={600}
-        color="#ff2625"
-        sx={{ opacity: 0.1, display: { lg: "block", xs: "none" } }}
-        fontSize="200px"
-      >
-        Exercises
-      </Typography>
-      <img
-        src={HeroBannerImage as string}
-        alt="banner"
-        className="hero-banner-img"
-      />
+    <Box component="section" className="hero-section">
+      <Stack className="hero-copy">
+        <Typography className="eyebrow">
+          Fitness Club
+        </Typography>
+        <Typography component="h1" className="hero-title">
+          Entrena con intención, sin ruido.
+        </Typography>
+        <Typography className="hero-text">
+          Busca ejercicios, filtra por zona del cuerpo y abre rutinas visuales para moverte mejor desde el primer set.
+        </Typography>
+        <Stack direction="row" className="hero-actions">
+          <Button className="primary-button" variant="contained" href="#exercises">
+            Explorar ejercicios
+          </Button>
+          <Button className="secondary-button" variant="outlined" href="#search">
+            Buscar rutina
+          </Button>
+        </Stack>
+        <Stack direction="row" className="hero-stats">
+          <span><strong>12+</strong> ejercicios base</span>
+          <span><strong>7</strong> zonas clave</span>
+          <span><strong>0</strong> distracciones</span>
+        </Stack>
+      </Stack>
+      <Box className="hero-visual">
+        <img
+          src={HeroBannerImage as string}
+          alt="Atleta entrenando con bandas"
+        />
+      </Box>
     </Box>
   );
 };

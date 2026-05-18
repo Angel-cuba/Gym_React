@@ -4,6 +4,10 @@ import { Box, Stack, Typography } from "@mui/material";
 import ExerciseCard from "../Search/Card/Card.Exercise";
 import { Exercise } from "../../types/exercises.types";
 import { exerciseOptions, fetchData } from "../../utils/fetchData";
+import {
+  fallbackExercises,
+  getFallbackExercisesByBodyPart,
+} from "../../data/fallbackExercises";
 
 /**
  * A component to display a list of exercises.
@@ -21,6 +25,7 @@ const ExerciseList = ({
   setExercises: (exercises: Exercise[]) => void;
 }): JSX.Element => {
   const [currentPage, setCurrentPage] = React.useState<number>(1);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   const exercisePerPage = 12;
   const indexOfLastExercise = currentPage * exercisePerPage;
@@ -38,53 +43,62 @@ const ExerciseList = ({
   const paginate = (e: React.ChangeEvent<unknown>, value: number): void => {
     setCurrentPage(value);
 
-    window.scrollTo({ top: 1800, behavior: "smooth" });
+    document.getElementById("exercises")?.scrollIntoView({ behavior: "smooth" });
   };
 
   React.useEffect(() => {
-    const fetch = async () => {
-      let exerciseData: Exercise[] = [];
-      if (bodyPart === "back") {
-        exerciseData = await fetchData(
+    const fetchExercises = async () => {
+      setIsLoading(true);
+      const fallback = getFallbackExercisesByBodyPart(bodyPart);
+      let exerciseData: Exercise[] | null = null;
+
+      if (bodyPart === "all") {
+        exerciseData = await fetchData<Exercise[]>(
           "https://exercisedb.p.rapidapi.com/exercises",
           exerciseOptions
         );
       } else {
-        exerciseData = await fetchData(
+        exerciseData = await fetchData<Exercise[]>(
           `https://exercisedb.p.rapidapi.com/exercises/bodyPart/${bodyPart}`,
           exerciseOptions
         );
       }
-      setExercises(exerciseData);
+
+      setExercises(exerciseData?.length ? exerciseData : fallback.length ? fallback : fallbackExercises);
+      setCurrentPage(1);
+      setIsLoading(false);
     };
-    fetch();
+
+    fetchExercises();
   }, [bodyPart, setExercises]);
 
   return (
     <Box
       id="exercises"
-      sx={{ mt: { lg: "110px", xs: "30px" } }}
-      mt={"50px"}
-      p={"20px"}
+      component="section"
+      className="exercise-section"
     >
-      <Typography variant="h3" mb="45px">
-        Showing results
-      </Typography>
-      <Stack
-        direction="row"
-        sx={{ gap: { lg: "110px", xs: "50px" } }}
-        flexWrap="wrap"
-        justifyContent="center"
-      >
-        {!currentExercises?.length ? (
-          <Typography variant="h4">No exercises found</Typography>
+      <Stack className="section-heading">
+        <Typography className="eyebrow">Resultados</Typography>
+        <Typography className="section-title">
+          {bodyPart === "all" ? "Todos los ejercicios" : `Ejercicios para ${bodyPart}`}
+        </Typography>
+        <Typography className="muted-copy">
+          {exercises.length} movimientos disponibles
+        </Typography>
+      </Stack>
+      <Stack className="exercise-grid">
+        {isLoading ? (
+          <Typography className="empty-state">Cargando ejercicios...</Typography>
+        ) : !currentExercises?.length ? (
+          <Typography className="empty-state">No se encontraron ejercicios.</Typography>
         ) : (
           currentExercises?.map((exercise: Exercise, index: number) => {
-            return <ExerciseCard key={index} exercise={exercise} />;
+            return <ExerciseCard key={exercise.id || index} exercise={exercise} />;
           })
         )}
       </Stack>
-      <Stack mt="100px" alignItems="center">
+      <Stack mt="48px" alignItems="center">
         {exercises?.length > 10 && (
           <Pagination
             color="standard"
