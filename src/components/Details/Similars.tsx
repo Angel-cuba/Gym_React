@@ -1,5 +1,6 @@
 import { Box, Stack, Typography } from "@mui/material";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import HorizontalScrollbar from "../HorizontalScrollbar";
 import { Exercise } from "../../types/exercises.types";
 
@@ -16,10 +17,12 @@ const Similars = ({
   similarsTarget: Exercise[] | null;
   equipment: Exercise[] | null;
 }): JSX.Element => {
+  const { t } = useTranslation();
+
   return (
     <Box component="section" className="similar-section">
       <Typography className="section-title" align="center">
-        Ejercicios similares
+        {t("similars.title")}
       </Typography>
       <Stack className="similar-block">
         {similarsTarget?.length ? (
@@ -32,13 +35,13 @@ const Similars = ({
           />
         ) : (
           <Typography className="empty-state" textAlign="center">
-            No hay ejercicios similares disponibles.
+            {t("similars.emptyTarget")}
           </Typography>
         )}
       </Stack>
       <Stack className="similar-block">
         <Typography className="eyebrow" align="center">
-          Mismo equipo
+          {t("similars.sameEquipment")}
         </Typography>
         {equipment?.length ? (
           <HorizontalScrollbar
@@ -50,7 +53,7 @@ const Similars = ({
           />
         ) : (
           <Typography className="empty-state" textAlign="center">
-            No hay alternativas con este equipo.
+            {t("similars.emptyEquipment")}
           </Typography>
         )}
       </Stack>

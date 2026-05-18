@@ -1,6 +1,6 @@
-const buildRapidApiHeaders = (host: string): HeadersInit => {
+const buildYoutubeHeaders = (): HeadersInit => {
   const headers: Record<string, string> = {
-    "X-RapidAPI-Host": host,
+    "X-RapidAPI-Host": "youtube-search-and-download.p.rapidapi.com",
   };
 
   if (process.env.REACT_APP_RAPID_API_KEY) {
@@ -10,14 +10,9 @@ const buildRapidApiHeaders = (host: string): HeadersInit => {
   return headers;
 };
 
-export const exerciseOptions: RequestInit = {
-  method: "GET",
-  headers: buildRapidApiHeaders("exercisedb.p.rapidapi.com"),
-};
-
 export const youtubeOptions: RequestInit = {
   method: "GET",
-  headers: buildRapidApiHeaders("youtube-search-and-download.p.rapidapi.com"),
+  headers: buildYoutubeHeaders(),
 };
 
 export async function fetchData<T>(

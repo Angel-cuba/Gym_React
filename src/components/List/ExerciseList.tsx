@@ -1,13 +1,10 @@
 import React from "react";
 import Pagination from "@mui/material/Pagination";
 import { Box, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import ExerciseCard from "../Search/Card/Card.Exercise";
 import { Exercise } from "../../types/exercises.types";
-import { exerciseOptions, fetchData } from "../../utils/fetchData";
-import {
-  fallbackExercises,
-  getFallbackExercisesByBodyPart,
-} from "../../data/fallbackExercises";
+import { getExercisesByBodyPart } from "../../services/exerciseApi";
 
 /**
  * A component to display a list of exercises.
@@ -24,6 +21,7 @@ const ExerciseList = ({
   bodyPart: string;
   setExercises: (exercises: Exercise[]) => void;
 }): JSX.Element => {
+  const { t } = useTranslation();
   const [currentPage, setCurrentPage] = React.useState<number>(1);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
@@ -49,22 +47,9 @@ const ExerciseList = ({
   React.useEffect(() => {
     const fetchExercises = async () => {
       setIsLoading(true);
-      const fallback = getFallbackExercisesByBodyPart(bodyPart);
-      let exerciseData: Exercise[] | null = null;
+      const exerciseData = await getExercisesByBodyPart(bodyPart);
 
-      if (bodyPart === "all") {
-        exerciseData = await fetchData<Exercise[]>(
-          "https://exercisedb.p.rapidapi.com/exercises",
-          exerciseOptions
-        );
-      } else {
-        exerciseData = await fetchData<Exercise[]>(
-          `https://exercisedb.p.rapidapi.com/exercises/bodyPart/${bodyPart}`,
-          exerciseOptions
-        );
-      }
-
-      setExercises(exerciseData?.length ? exerciseData : fallback.length ? fallback : fallbackExercises);
+      setExercises(exerciseData);
       setCurrentPage(1);
       setIsLoading(false);
     };
@@ -79,19 +64,21 @@ const ExerciseList = ({
       className="exercise-section"
     >
       <Stack className="section-heading">
-        <Typography className="eyebrow">Resultados</Typography>
+        <Typography className="eyebrow">{t("exercises.eyebrow")}</Typography>
         <Typography className="section-title">
-          {bodyPart === "all" ? "Todos los ejercicios" : `Ejercicios para ${bodyPart}`}
+          {bodyPart === "all"
+            ? t("exercises.allTitle")
+            : t("exercises.byBodyPart", { bodyPart })}
         </Typography>
         <Typography className="muted-copy">
-          {exercises.length} movimientos disponibles
+          {t("exercises.count", { count: exercises.length })}
         </Typography>
       </Stack>
       <Stack className="exercise-grid">
         {isLoading ? (
-          <Typography className="empty-state">Cargando ejercicios...</Typography>
+          <Typography className="empty-state">{t("exercises.loading")}</Typography>
         ) : !currentExercises?.length ? (
-          <Typography className="empty-state">No se encontraron ejercicios.</Typography>
+          <Typography className="empty-state">{t("exercises.empty")}</Typography>
         ) : (
           currentExercises?.map((exercise: Exercise, index: number) => {
             return <ExerciseCard key={exercise.id || index} exercise={exercise} />;

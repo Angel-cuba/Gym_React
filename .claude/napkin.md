@@ -17,9 +17,11 @@
    Do instead: document repeatable command workarounds only after they prove useful.
 
 ## Domain Behavior Guardrails
-1. **[2026-05-18] RapidAPI key may be absent**
-   Do instead: keep local fallback exercise data and skip RapidAPI calls without `REACT_APP_RAPID_API_KEY`.
-2. **[2026-05-18] Preserve gym discovery flow**
+1. **[2026-05-18] Exercise data source**
+   Do instead: use `src/services/exerciseApi.ts` against `https://oss.exercisedb.dev/api/v1` and keep local fallback data if the hosted API fails.
+2. **[2026-05-18] RapidAPI key may be absent**
+   Do instead: keep YouTube/RapidAPI optional and skip RapidAPI calls without `REACT_APP_RAPID_API_KEY`.
+3. **[2026-05-18] Preserve gym discovery flow**
    Do instead: keep hero, search/filter, exercise cards, and exercise detail routes usable after redesigning.
 
 ## User Directives

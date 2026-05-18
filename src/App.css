@@ -111,6 +111,44 @@ input {
   background: var(--surface-soft);
 }
 
+.language-switcher {
+  position: fixed;
+  top: 92px;
+  right: max(20px, calc((100vw - 1440px) / 2 + 28px));
+  z-index: 20;
+  display: inline-flex;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid rgba(222, 216, 206, 0.9);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 14px 32px rgba(47, 52, 55, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+.language-switcher button {
+  min-width: 42px;
+  min-height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+}
+
+.language-switcher button:hover {
+  color: var(--ink);
+  background: var(--surface-soft);
+}
+
+.language-switcher button.active {
+  background: var(--ink);
+  color: #fff;
+}
+
 .hero-section {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(360px, 0.78fr);
@@ -456,6 +494,21 @@ input {
   font-weight: 800;
 }
 
+.instructions-panel {
+  gap: 10px;
+  margin-top: 12px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.instruction-copy {
+  color: var(--muted);
+  font-size: 0.96rem !important;
+  line-height: 1.55 !important;
+}
+
 .video-grid {
   display: grid !important;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -537,6 +590,11 @@ input {
 
   .nav-links a {
     padding: 0 12px;
+  }
+
+  .language-switcher {
+    top: 152px;
+    right: 18px;
   }
 
   .hero-section {

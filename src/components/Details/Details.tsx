@@ -3,6 +3,7 @@ import BodyPartImage from "../../assets/icons/body-part.png";
 import TargetImage from "../../assets/icons/target.png";
 import EquipmentImage from "../../assets/icons/equipment.png";
 import { Box, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { Exercise } from "../../types/exercises.types";
 
 /**
@@ -16,10 +17,12 @@ const Details = ({
 }: {
   exerciseDetails: Exercise | null;
 }): JSX.Element => {
+  const { t } = useTranslation();
+
   if (!exerciseDetails) {
     return (
       <Box className="details-section">
-        <Typography className="empty-state">Cargando detalle...</Typography>
+        <Typography className="empty-state">{t("details.loading")}</Typography>
       </Box>
     );
   }
@@ -62,27 +65,43 @@ const Details = ({
             exerciseDetails.name.slice(1)}
         </Typography>
         <Typography className="muted-copy">
-          {exerciseDetails.name[0].toUpperCase() +
-            exerciseDetails.name.slice(1)}{" "}
-          trabaja principalmente {exerciseDetails.target}. Úsalo para fortalecer{" "}
-          {exerciseDetails.bodyPart}, mejorar control y sumar energía a tu rutina.
+          {t("details.description", {
+            name:
+              exerciseDetails.name[0].toUpperCase() +
+              exerciseDetails.name.slice(1),
+            target: exerciseDetails.target,
+            bodyPart: exerciseDetails.bodyPart,
+          })}
         </Typography>
         <Stack className="detail-metadata">
-        {smallDetails.map((detail, index) => {
-          return (
-            <Stack key={index} direction="row" className="detail-pill" alignItems="center">
-              <span>
-                <img src={detail.icon} alt={detail.name} />
-              </span>
-              <Typography
-                textTransform="capitalize"
+          {smallDetails.map((detail, index) => {
+            return (
+              <Stack
+                key={index}
+                direction="row"
+                className="detail-pill"
+                alignItems="center"
               >
-                {detail.name}
-              </Typography>
-            </Stack>
-          );
-        })}
+                <span>
+                  <img src={detail.icon} alt={detail.name} />
+                </span>
+                <Typography textTransform="capitalize">
+                  {detail.name}
+                </Typography>
+              </Stack>
+            );
+          })}
         </Stack>
+        {!!exerciseDetails.instructions?.length && (
+          <Stack className="instructions-panel">
+            <Typography className="eyebrow">{t("details.instructions")}</Typography>
+            {exerciseDetails.instructions.slice(0, 6).map((instruction) => (
+              <Typography key={instruction} className="instruction-copy">
+                {instruction.replace(/^Step:\d+\s*/i, "")}
+              </Typography>
+            ))}
+          </Stack>
+        )}
       </Stack>
     </Stack>
   );

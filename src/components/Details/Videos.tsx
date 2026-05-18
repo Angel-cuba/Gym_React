@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { Video } from "../../types/exercises.types";
 
 /**
@@ -16,14 +17,17 @@ const Videos = ({
   videos: Video[];
   name: string;
 }): JSX.Element => {
+  const { t } = useTranslation();
+  const exerciseName = name || t("videos.fallbackName");
+
   return (
     <Box component="section" className="video-section">
       <Typography className="section-title" align="center">
-        Videos de {name || "este ejercicio"}
+        {t("videos.title", { name: exerciseName })}
       </Typography>
       {!videos?.length ? (
         <Typography className="empty-state" textAlign="center">
-          No hay videos disponibles por ahora.
+          {t("videos.empty")}
         </Typography>
       ) : (
         <Stack className="video-grid">

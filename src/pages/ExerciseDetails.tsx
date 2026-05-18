@@ -5,7 +5,12 @@ import Details from "../components/Details/Details";
 import Similars from "../components/Details/Similars";
 import Videos from "../components/Details/Videos";
 import { Exercise, Video } from "../types/exercises.types";
-import { exerciseOptions, fetchData, youtubeOptions } from "../utils/fetchData";
+import {
+  getExerciseById,
+  getSimilarByEquipment,
+  getSimilarByTarget,
+} from "../services/exerciseApi";
+import { fetchData, youtubeOptions } from "../utils/fetchData";
 import {
   fallbackExercises,
   getFallbackExerciseById,
@@ -28,13 +33,9 @@ const ExerciseDetails = () => {
 
   React.useEffect(() => {
     const exerciseDbUrl = async () => {
-      const fetch = "https://exercisedb.p.rapidapi.com/exercises";
       const ytUrl = "https://youtube-search-and-download.p.rapidapi.com";
 
-      const exerciseDetailData = await fetchData<Exercise>(
-        `${fetch}/exercise/${id}`,
-        exerciseOptions
-      );
+      const exerciseDetailData = await getExerciseById(id);
       const safeExercise = exerciseDetailData ?? getFallbackExerciseById(id);
       setExercisesDetails(safeExercise);
 
@@ -51,9 +52,9 @@ const ExerciseDetails = () => {
       );
       setVideos(exerciseYoutubeData?.contents ?? []);
 
-      const similarsData = await fetchData<Exercise[]>(
-        `${fetch}/target/${safeExercise.target}`,
-        exerciseOptions
+      const similarsData = await getSimilarByTarget(
+        safeExercise.target,
+        safeExercise.id
       );
       setSimilarsTarget(
         similarsData?.length
@@ -61,9 +62,9 @@ const ExerciseDetails = () => {
           : fallbackExercises.filter((exercise) => exercise.target === safeExercise.target)
       );
 
-      const equipmentData = await fetchData<Exercise[]>(
-        `${fetch}/equipment/${safeExercise.equipment}`,
-        exerciseOptions
+      const equipmentData = await getSimilarByEquipment(
+        safeExercise.equipment,
+        safeExercise.id
       );
       setEquipment(
         equipmentData?.length

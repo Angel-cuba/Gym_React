@@ -1,5 +1,6 @@
 import React from "react";
 import { Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 /**
  * A component that renders a body part card.
@@ -16,6 +17,9 @@ const BodyPart = ({
   bodyPart: string;
   setBodyPart: (bodyPart: string) => void;
 }): JSX.Element => {
+  const { t } = useTranslation();
+  const label = item === "all" ? t("exercises.all") : item;
+
   return (
     <Stack
       component="button"
@@ -34,7 +38,7 @@ const BodyPart = ({
         className="bodyPart-label"
         textTransform="capitalize"
       >
-        {item}
+        {label}
       </Typography>
     </Stack>
   );
