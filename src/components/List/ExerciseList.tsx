@@ -4,11 +4,10 @@ import { Box, Stack, Typography } from "@mui/material";
 import { motion } from "framer-motion";
 import ExerciseCard, { cardItemVariant } from "../Search/Card/Card.Exercise";
 import { Exercise } from "../../types/exercises.types";
-import { exerciseOptions, fetchData } from "../../utils/fetchData";
 import {
-  fallbackExercises,
-  getFallbackExercisesByBodyPart,
-} from "../../data/fallbackExercises";
+  getExercisesByBodyPart,
+} from "../../services/exerciseApi";
+import { fallbackExercises } from "../../data/fallbackExercises";
 
 /**
  * A component to display a list of exercises.
@@ -50,22 +49,8 @@ const ExerciseList = ({
   React.useEffect(() => {
     const fetchExercises = async () => {
       setIsLoading(true);
-      const fallback = getFallbackExercisesByBodyPart(bodyPart);
-      let exerciseData: Exercise[] | null = null;
-
-      if (bodyPart === "all") {
-        exerciseData = await fetchData<Exercise[]>(
-          "https://exercisedb.p.rapidapi.com/exercises",
-          exerciseOptions
-        );
-      } else {
-        exerciseData = await fetchData<Exercise[]>(
-          `https://exercisedb.p.rapidapi.com/exercises/bodyPart/${bodyPart}`,
-          exerciseOptions
-        );
-      }
-
-      setExercises(exerciseData?.length ? exerciseData : fallback.length ? fallback : fallbackExercises);
+      const exerciseData = await getExercisesByBodyPart(bodyPart);
+      setExercises(exerciseData.length ? exerciseData : fallbackExercises);
       setCurrentPage(1);
       setIsLoading(false);
     };

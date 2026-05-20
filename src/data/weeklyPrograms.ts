@@ -28,8 +28,6 @@ export interface WeeklyProgram {
   weeks: WeekPlan[];
 }
 
-const DAYS_ES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-
 export const weeklyPrograms: WeeklyProgram[] = [
   {
     id: "full-body",

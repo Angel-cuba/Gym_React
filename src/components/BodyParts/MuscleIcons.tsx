@@ -11,7 +11,7 @@ const colors = (active?: boolean) => ({
 });
 
 const All = ({ active }: IconProps) => {
-  const { body, muscle } = colors(active);
+  const { muscle } = colors(active);
   return (
     <svg viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="30" cy="9" r="7" fill={muscle} />
@@ -62,7 +62,7 @@ const Back = ({ active }: IconProps) => {
 };
 
 const Cardio = ({ active }: IconProps) => {
-  const { body, muscle, accent } = colors(active);
+  const { muscle } = colors(active);
   return (
     <svg viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
