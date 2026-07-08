@@ -31,8 +31,8 @@ const extractClerkError = (err: unknown): Error => {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { user: clerkUser, isLoaded } = useUser();
-  const { signIn: clerkSignIn, isLoaded: signInLoaded } = useSignIn();
-  const { signUp: clerkSignUp, isLoaded: signUpLoaded } = useSignUp();
+  const { signIn: clerkSignIn, setActive: setSignInActive, isLoaded: signInLoaded } = useSignIn();
+  const { signUp: clerkSignUp, setActive: setSignUpActive, isLoaded: signUpLoaded } = useSignUp();
   const { signOut: clerkSignOut } = useClerk();
   const { getToken } = useClerkAuth();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -67,7 +67,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         firstName: displayName,
       });
 
-      if (result.status === "complete") {
+      if (result.status === "complete" && result.createdSessionId) {
+        await setSignUpActive!({ session: result.createdSessionId });
         return { error: null, needsConfirmation: false };
       }
 
@@ -93,7 +94,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
     try {
       const result = await clerkSignUp.attemptEmailAddressVerification({ code });
-      if (result.status === "complete") {
+      if (result.status === "complete" && result.createdSessionId) {
+        await setSignUpActive!({ session: result.createdSessionId });
         return { error: null };
       }
       return { error: new Error("Verification incomplete") };
@@ -110,10 +112,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return { error: new Error("Auth not ready") };
     }
     try {
-      await clerkSignIn.create({
+      const result = await clerkSignIn.create({
         identifier: email,
         password,
       });
+      if (result.status === "complete" && result.createdSessionId) {
+        await setSignInActive!({ session: result.createdSessionId });
+      }
       return { error: null };
     } catch (err) {
       return { error: extractClerkError(err) };
