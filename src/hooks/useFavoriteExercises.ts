@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../lib/api";
 
 export interface FavoriteExercise {
   id: string;
@@ -26,11 +26,12 @@ export const useFavoriteExercises = () => {
   const loadFavorites = useCallback(async () => {
     if (!user) { setFavorites([]); return; }
     setLoading(true);
-    const { data } = await supabase
-      .from("favorite_exercises")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setFavorites(data ?? []);
+    try {
+      const data = await apiFetch<FavoriteExercise[]>("/favorites");
+      setFavorites(data ?? []);
+    } catch {
+      setFavorites([]);
+    }
     setLoading(false);
   }, [user]);
 
@@ -42,25 +43,22 @@ export const useFavoriteExercises = () => {
   const toggle = async (exercise: ToggleExercise): Promise<void> => {
     if (!user) return;
     if (isFavorite(exercise.id)) {
-      await supabase
-        .from("favorite_exercises")
-        .delete()
-        .eq("exercise_id", exercise.id)
-        .eq("user_id", user.id);
+      await apiFetch("/favorites", {
+        method: "DELETE",
+        body: JSON.stringify({ exercise_id: exercise.id }),
+      });
       setFavorites((prev) => prev.filter((f) => f.exercise_id !== exercise.id));
     } else {
-      const { data } = await supabase
-        .from("favorite_exercises")
-        .insert({
-          user_id: user.id,
+      const row = await apiFetch<FavoriteExercise>("/favorites", {
+        method: "POST",
+        body: JSON.stringify({
           exercise_id: exercise.id,
           exercise_name: exercise.name,
           body_part: exercise.bodyPart,
           gif_url: exercise.gifUrl,
-        })
-        .select()
-        .single();
-      if (data) setFavorites((prev) => [data, ...prev]);
+        }),
+      });
+      if (row) setFavorites((prev) => [row, ...prev]);
     }
   };
 

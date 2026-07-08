@@ -1,10 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { User, Session } from "@supabase/supabase-js";
-import { supabase } from "../lib/supabase";
+import { useUser, useSignIn, useSignUp, useClerk, useAuth as useClerkAuth } from "@clerk/clerk-react";
+import { setTokenProvider } from "../lib/api";
+
+export interface AppUser {
+  id: string;
+  email: string;
+  displayName: string;
+}
 
 interface AuthContextValue {
-  user: User | null;
-  session: Session | null;
+  user: AppUser | null;
   loading: boolean;
   loginModalOpen: boolean;
   openLoginModal: () => void;
@@ -16,94 +21,84 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const SESSION_START_KEY = "gymlab_session_start";
-const SESSION_LIMIT_MS = 72 * 60 * 60 * 1000; // 72 horas
-
-const isSessionExpired = (): boolean => {
-  const stored = localStorage.getItem(SESSION_START_KEY);
-  if (!stored) return false;
-  return Date.now() - parseInt(stored, 10) > SESSION_LIMIT_MS;
-};
-
-/** Limpia el timestamp y cierra sesión en Supabase. El estado React se
- *  actualiza via onAuthStateChange, por eso no recibe setters. */
-const expireSession = async (): Promise<void> => {
-  localStorage.removeItem(SESSION_START_KEY);
-  await supabase.auth.signOut();
-};
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user: clerkUser, isLoaded } = useUser();
+  const { signIn: clerkSignIn, isLoaded: signInLoaded } = useSignIn();
+  const { signUp: clerkSignUp, isLoaded: signUpLoaded } = useSignUp();
+  const { signOut: clerkSignOut } = useClerk();
+  const { getToken } = useClerkAuth();
   const [loginModalOpen, setLoginModalOpen] = useState(false);
 
   useEffect(() => {
-    // Verificar sesión al montar — forzar logout si expiró las 72 h
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session && isSessionExpired()) {
-        expireSession();
-      } else {
-        setSession(session);
-        setUser(session?.user ?? null);
+    setTokenProvider(() => getToken());
+  }, [getToken]);
+
+  const user: AppUser | null = clerkUser
+    ? {
+        id: clerkUser.id,
+        email: clerkUser.primaryEmailAddress?.emailAddress ?? "",
+        displayName:
+          clerkUser.firstName ??
+          clerkUser.primaryEmailAddress?.emailAddress?.split("@")[0] ??
+          "Usuario",
       }
-      setLoading(false);
-    });
+    : null;
 
-    // Escuchar cambios de auth (refresh de token, logout desde otra pestaña, etc.)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-    });
-
-    // Revisión periódica cada 30 minutos para sesiones largas abiertas
-    const expiryInterval = setInterval(async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session && isSessionExpired()) {
-        expireSession();
-      }
-    }, 30 * 60 * 1000);
-
-    return () => {
-      subscription.unsubscribe();
-      clearInterval(expiryInterval);
-    };
-  }, []);
-
-  const signUp = async (email: string, password: string, displayName: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { display_name: displayName } },
-    });
-    if (!error && data.session) {
-      localStorage.setItem(SESSION_START_KEY, String(Date.now()));
+  const signUp = async (
+    email: string,
+    password: string,
+    displayName: string
+  ): Promise<{ error: Error | null; needsConfirmation: boolean }> => {
+    if (!clerkSignUp || !signUpLoaded) {
+      return { error: new Error("Auth not ready"), needsConfirmation: false };
     }
-    return {
-      error: error as Error | null,
-      needsConfirmation: !error && !data.session,
-    };
+    try {
+      const result = await clerkSignUp.create({
+        emailAddress: email,
+        password,
+        firstName: displayName,
+      });
+
+      if (result.status === "complete") {
+        return { error: null, needsConfirmation: false };
+      }
+
+      await clerkSignUp.prepareEmailAddressVerification({ strategy: "email_link", redirectUrl: window.location.origin });
+      return { error: null, needsConfirmation: true };
+    } catch (err) {
+      const message = (err as { errors?: { longMessage?: string }[] })?.errors?.[0]?.longMessage ?? (err as Error).message;
+      return { error: new Error(message), needsConfirmation: false };
+    }
   };
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (!error) {
-      localStorage.setItem(SESSION_START_KEY, String(Date.now()));
+  const signIn = async (
+    email: string,
+    password: string
+  ): Promise<{ error: Error | null }> => {
+    if (!clerkSignIn || !signInLoaded) {
+      return { error: new Error("Auth not ready") };
     }
-    return { error: error as Error | null };
+    try {
+      await clerkSignIn.create({
+        identifier: email,
+        password,
+      });
+      return { error: null };
+    } catch (err) {
+      const message = (err as { errors?: { longMessage?: string }[] })?.errors?.[0]?.longMessage ?? (err as Error).message;
+      return { error: new Error(message) };
+    }
   };
 
   const signOut = async () => {
-    localStorage.removeItem(SESSION_START_KEY);
-    await supabase.auth.signOut();
+    await clerkSignOut();
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        session,
-        loading,
+        loading: !isLoaded,
         loginModalOpen,
         openLoginModal: () => setLoginModalOpen(true),
         closeLoginModal: () => setLoginModalOpen(false),

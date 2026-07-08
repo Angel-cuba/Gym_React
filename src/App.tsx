@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { Box } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
+import { ClerkProvider } from "@clerk/clerk-react";
 
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
@@ -9,6 +10,8 @@ import { LoginModal } from "./components/Auth/LoginModal";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import "./App.css";
+
+const CLERK_KEY = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY!;
 
 const Home = React.lazy(() => import("./pages/Home"));
 const ExerciseDetails = React.lazy(() => import("./pages/ExerciseDetails"));
@@ -62,11 +65,13 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <FavoritesProvider>
-        <AppContent />
-      </FavoritesProvider>
-    </AuthProvider>
+    <ClerkProvider publishableKey={CLERK_KEY}>
+      <AuthProvider>
+        <FavoritesProvider>
+          <AppContent />
+        </FavoritesProvider>
+      </AuthProvider>
+    </ClerkProvider>
   );
 }
 

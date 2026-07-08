@@ -12,22 +12,25 @@ Cuando uses herramientas de archivo (Read, Write, Edit), usa siempre rutas absol
 
 ## Variables de entorno requeridas
 
-Crea un archivo `.env` en la raíz con estas variables antes de iniciar el proyecto:
-
+### Frontend (archivo `.env` en la raíz):
 ```
-REACT_APP_SUPABASE_URL=https://ttebvjaindmwcdhnpbhc.supabase.co
-REACT_APP_SUPABASE_ANON_KEY=<tu-anon-key>
+REACT_APP_CLERK_PUBLISHABLE_KEY=pk_test_...
+REACT_APP_RAPID_API_KEY=...  (opcional, para videos de YouTube)
 ```
 
-El cliente Supabase (`src/lib/supabase.ts`) las lee con `process.env.REACT_APP_*`.  
-La anon key es pública por diseño — Supabase RLS restringe los datos por usuario.
+### Netlify Functions (configurar en dashboard de Netlify):
+```
+CLERK_SECRET_KEY=sk_test_...
+DATABASE_URL=postgresql://...@ep-xxx.aws.neon.tech/neondb?sslmode=require
+```
 
 ## Stack
 
 - React 18 + TypeScript 4.7 (Create React App — no Vite)
-- Supabase Auth + PostgreSQL  
-  - Project: `ttebvjaindmwcdhnpbhc` (eu-west-1)
-  - Client singleton: `src/lib/supabase.ts`
+- Clerk Auth (`@clerk/clerk-react` + `@clerk/backend`)
+- Neon Postgres (`@neondatabase/serverless`)
+- Drizzle ORM (schema en `netlify/functions/db/schema.ts`)
+- Netlify Functions (API serverless en `netlify/functions/`)
 - Framer Motion (animaciones)
 - MUI v5 (componentes base)
 - i18next (internacionalización, parcialmente implementado)
@@ -35,14 +38,16 @@ La anon key es pública por diseño — Supabase RLS restringe los datos por usu
 ## Arquitectura de contextos
 
 ```
-AuthProvider          → src/context/AuthContext.tsx
-  FavoritesProvider   → src/context/FavoritesContext.tsx
-    AppContent        → renders <LoginModal> + <Routes>
+ClerkProvider         → @clerk/clerk-react
+  AuthProvider        → src/context/AuthContext.tsx (thin adapter sobre Clerk)
+    FavoritesProvider → src/context/FavoritesContext.tsx
+      AppContent      → <Navbar> + <AnimatedRoutes> + <Footer> + <LoginModal>
 ```
 
-- `AuthContext` expone: `user`, `signIn`, `signUp`, `signOut`, `openLoginModal`
+- `AuthContext` expone: `user` (AppUser), `signIn`, `signUp`, `signOut`, `openLoginModal`
 - `FavoritesContext` wrappea `useFavoriteExercises` — se carga una sola vez
 - `openLoginModal()` — accesible desde cualquier componente, sin prop drilling
+- Los hooks de datos (`useSavedRoutines`, `useFavoriteExercises`) usan `src/lib/api.ts` para llamar a las Netlify Functions
 
 ## Rutas
 
@@ -52,12 +57,14 @@ AuthProvider          → src/context/AuthContext.tsx
 | `/exercise/:id` | `ExerciseDetail` | No |
 | `/my-routines` | `MyRoutines` | Sí (muestra login prompt si no hay sesión) |
 
-## Base de datos Supabase
+## Base de datos (Neon Postgres)
+
+Schema definido en `netlify/functions/db/schema.ts` (Drizzle ORM).
 
 ### `saved_routines`
 ```sql
-id            uuid PK
-user_id       uuid FK → auth.users
+id            uuid PK (defaultRandom)
+user_id       text (Clerk user ID)
 program_id    text
 program_name  text
 level         text
@@ -69,8 +76,8 @@ created_at    timestamptz
 
 ### `favorite_exercises`
 ```sql
-id            uuid PK
-user_id       uuid FK → auth.users
+id            uuid PK (defaultRandom)
+user_id       text (Clerk user ID)
 exercise_id   text
 exercise_name text
 body_part     text
@@ -78,7 +85,14 @@ gif_url       text
 created_at    timestamptz
 ```
 
-Ambas tablas tienen RLS — cada usuario solo ve sus propios datos.
+Seguridad: application-level auth en cada Netlify Function (JWT → user_id en todos los WHERE).
+
+## API (Netlify Functions)
+
+| Endpoint | Métodos | Archivo |
+|----------|---------|---------|
+| `/api/routines` | GET, POST, PUT, DELETE | `netlify/functions/routines.ts` |
+| `/api/favorites` | GET, POST, DELETE | `netlify/functions/favorites.ts` |
 
 ## Estilos
 

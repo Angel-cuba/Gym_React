@@ -9,9 +9,7 @@ const Navbar = () => {
   const { t } = useTranslation();
   const { user, signOut, openLoginModal } = useAuth();
 
-  const displayName = user?.user_metadata?.display_name
-    ?? user?.email?.split("@")[0]
-    ?? "Usuario";
+  const displayName = user?.displayName ?? "Usuario";
 
   return (
     <Stack component="nav" className="navbar" direction="row">

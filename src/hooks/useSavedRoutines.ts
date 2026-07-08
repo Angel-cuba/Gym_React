@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../lib/api";
 
 export interface SavedRoutine {
   id: string;
@@ -30,11 +30,12 @@ export const useSavedRoutines = () => {
   const loadRoutines = useCallback(async () => {
     if (!user) { setRoutines([]); return; }
     setLoading(true);
-    const { data } = await supabase
-      .from("saved_routines")
-      .select("*")
-      .order("created_at", { ascending: false });
-    setRoutines(data ?? []);
+    try {
+      const data = await apiFetch<SavedRoutine[]>("/routines");
+      setRoutines(data ?? []);
+    } catch {
+      setRoutines([]);
+    }
     setLoading(false);
   }, [user]);
 
@@ -42,17 +43,23 @@ export const useSavedRoutines = () => {
 
   const save = async (input: SaveRoutineInput): Promise<boolean> => {
     if (!user) return false;
-    const { data } = await supabase
-      .from("saved_routines")
-      .insert({ ...input, user_id: user.id })
-      .select()
-      .single();
-    if (data) setRoutines((prev) => [data, ...prev]);
-    return !!data;
+    try {
+      const row = await apiFetch<SavedRoutine>("/routines", {
+        method: "POST",
+        body: JSON.stringify(input),
+      });
+      if (row) setRoutines((prev) => [row, ...prev]);
+      return !!row;
+    } catch {
+      return false;
+    }
   };
 
   const remove = async (id: string): Promise<void> => {
-    await supabase.from("saved_routines").delete().eq("id", id);
+    await apiFetch("/routines", {
+      method: "DELETE",
+      body: JSON.stringify({ id }),
+    });
     setRoutines((prev) => prev.filter((r) => r.id !== id));
   };
 
@@ -60,13 +67,11 @@ export const useSavedRoutines = () => {
     id: string,
     changes: { selected_weeks?: 1 | 2 | 3; notes?: string | null }
   ): Promise<void> => {
-    const { data } = await supabase
-      .from("saved_routines")
-      .update(changes)
-      .eq("id", id)
-      .select()
-      .single();
-    if (data) setRoutines((prev) => prev.map((r) => (r.id === id ? (data as SavedRoutine) : r)));
+    const row = await apiFetch<SavedRoutine>("/routines", {
+      method: "PUT",
+      body: JSON.stringify({ id, ...changes }),
+    });
+    if (row) setRoutines((prev) => prev.map((r) => (r.id === id ? row : r)));
   };
 
   const isSaved = (programId: string) =>
