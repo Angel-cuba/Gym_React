@@ -14,7 +14,7 @@ interface AuthContextValue {
   loginModalOpen: boolean;
   openLoginModal: () => void;
   closeLoginModal: () => void;
-  signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null; needsConfirmation: boolean }>;
+  signUp: (email: string, password: string, displayName: string) => Promise<{ error: Error | null; needsConfirmation: boolean; strategy?: "email_code" | "email_link" }>;
   verifyCode: (code: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     email: string,
     password: string,
     displayName: string
-  ): Promise<{ error: Error | null; needsConfirmation: boolean }> => {
+  ): Promise<{ error: Error | null; needsConfirmation: boolean; strategy?: "email_code" | "email_link" }> => {
     if (!clerkSignUp || !signUpLoaded) {
       return { error: new Error("Auth not ready"), needsConfirmation: false };
     }
@@ -71,15 +71,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return { error: null, needsConfirmation: false };
       }
 
+      let strategy: "email_code" | "email_link" = "email_code";
       try {
         await clerkSignUp.prepareEmailAddressVerification({ strategy: "email_code" });
       } catch {
+        strategy = "email_link";
         await clerkSignUp.prepareEmailAddressVerification({
           strategy: "email_link",
           redirectUrl: window.location.origin,
         });
       }
-      return { error: null, needsConfirmation: true };
+      return { error: null, needsConfirmation: true, strategy };
     } catch (err) {
       return { error: extractClerkError(err), needsConfirmation: false };
     }

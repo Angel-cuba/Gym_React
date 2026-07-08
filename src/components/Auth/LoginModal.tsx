@@ -33,6 +33,7 @@ export const LoginModal = ({ isOpen, onClose }: Props) => {
   const [submitting, setSubmitting] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [code, setCode] = useState("");
+  const [verifyStrategy, setVerifyStrategy] = useState<"email_code" | "email_link">("email_code");
   const { signIn, signUp, verifyCode } = useAuth();
 
   const onCloseRef = useRef(onClose);
@@ -55,6 +56,7 @@ export const LoginModal = ({ isOpen, onClose }: Props) => {
     setError("");
     setSubmitting(false);
     setConfirmed(false);
+    setVerifyStrategy("email_code");
   };
 
   const handleClose = () => { reset(); onClose(); };
@@ -71,10 +73,14 @@ export const LoginModal = ({ isOpen, onClose }: Props) => {
       if (err) { setError(err.message); return; }
       handleClose();
     } else {
-      const { error: err, needsConfirmation } = await signUp(email, password, name);
+      const { error: err, needsConfirmation, strategy } = await signUp(email, password, name);
       setSubmitting(false);
       if (err) { setError(err.message); return; }
-      if (needsConfirmation) { setConfirmed(true); return; }
+      if (needsConfirmation) {
+        if (strategy) setVerifyStrategy(strategy);
+        setConfirmed(true);
+        return;
+      }
       handleClose();
     }
   };
@@ -120,38 +126,50 @@ export const LoginModal = ({ isOpen, onClose }: Props) => {
               </div>
 
               {confirmed ? (
-                <form className="auth-form" onSubmit={async (e) => {
-                  e.preventDefault();
-                  setError("");
-                  setSubmitting(true);
-                  const { error: err } = await verifyCode(code);
-                  setSubmitting(false);
-                  if (err) { setError(err.message); return; }
-                  handleClose();
-                }}>
-                  <p className="auth-confirm__sub">
-                    Enviamos un código a <strong>{email}</strong>.<br />
-                    Ingrésalo para verificar tu cuenta.
-                  </p>
-                  <div className="auth-field">
-                    <label className="auth-label">Código de verificación</label>
-                    <input
-                      className="auth-input"
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="123456"
-                      value={code}
-                      onChange={(e) => setCode(e.target.value)}
-                      required
-                      autoComplete="one-time-code"
-                      autoFocus
-                    />
+                verifyStrategy === "email_code" ? (
+                  <form className="auth-form" onSubmit={async (e) => {
+                    e.preventDefault();
+                    setError("");
+                    setSubmitting(true);
+                    const { error: err } = await verifyCode(code);
+                    setSubmitting(false);
+                    if (err) { setError(err.message); return; }
+                    handleClose();
+                  }}>
+                    <p className="auth-confirm__sub">
+                      Enviamos un código a <strong>{email}</strong>.<br />
+                      Ingrésalo para verificar tu cuenta.
+                    </p>
+                    <div className="auth-field">
+                      <label className="auth-label">Código de verificación</label>
+                      <input
+                        className="auth-input"
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="123456"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                        required
+                        autoComplete="one-time-code"
+                        autoFocus
+                      />
+                    </div>
+                    {error && <p className="auth-error">{error}</p>}
+                    <button className="auth-submit" type="submit" disabled={submitting}>
+                      {submitting ? "Verificando..." : "Verificar"}
+                    </button>
+                  </form>
+                ) : (
+                  <div className="auth-confirm">
+                    <p className="auth-confirm__sub">
+                      Enviamos un enlace a <strong>{email}</strong>.<br />
+                      Confirma tu cuenta y luego inicia sesión.
+                    </p>
+                    <button className="auth-submit" onClick={handleClose}>
+                      Entendido
+                    </button>
                   </div>
-                  {error && <p className="auth-error">{error}</p>}
-                  <button className="auth-submit" type="submit" disabled={submitting}>
-                    {submitting ? "Verificando..." : "Verificar"}
-                  </button>
-                </form>
+                )
               ) : (
                 <>
                   <div className="auth-tabs">
