@@ -29,6 +29,14 @@ const extractClerkError = (err: unknown): Error => {
   return new Error(message);
 };
 
+const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> =>
+  Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("La solicitud tardó demasiado. Intenta de nuevo.")), ms)
+    ),
+  ]);
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { user: clerkUser, isLoaded } = useUser();
   const { signIn: clerkSignIn, setActive: setSignInActive, isLoaded: signInLoaded } = useSignIn();
@@ -61,11 +69,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return { error: new Error("Auth not ready"), needsConfirmation: false };
     }
     try {
-      const result = await clerkSignUp.create({
-        emailAddress: email,
-        password,
-        firstName: displayName,
-      });
+      const result = await withTimeout(
+        clerkSignUp.create({
+          emailAddress: email,
+          password,
+          firstName: displayName,
+        }),
+        15000
+      );
 
       if (result.status === "complete" && result.createdSessionId) {
         await setSignUpActive!({ session: result.createdSessionId });
@@ -74,13 +85,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       let strategy: "email_code" | "email_link" = "email_code";
       try {
-        await clerkSignUp.prepareEmailAddressVerification({ strategy: "email_code" });
+        await withTimeout(
+          clerkSignUp.prepareEmailAddressVerification({ strategy: "email_code" }),
+          15000
+        );
       } catch {
         strategy = "email_link";
-        await clerkSignUp.prepareEmailAddressVerification({
-          strategy: "email_link",
-          redirectUrl: window.location.origin,
-        });
+        await withTimeout(
+          clerkSignUp.prepareEmailAddressVerification({
+            strategy: "email_link",
+            redirectUrl: window.location.origin,
+          }),
+          15000
+        );
       }
       return { error: null, needsConfirmation: true, strategy };
     } catch (err) {
@@ -93,7 +110,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return { error: new Error("Auth not ready") };
     }
     try {
-      const result = await clerkSignUp.attemptEmailAddressVerification({ code });
+      const result = await withTimeout(
+        clerkSignUp.attemptEmailAddressVerification({ code }),
+        15000
+      );
       if (result.status === "complete" && result.createdSessionId) {
         await setSignUpActive!({ session: result.createdSessionId });
         return { error: null };
@@ -112,10 +132,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return { error: new Error("Auth not ready") };
     }
     try {
-      const result = await clerkSignIn.create({
-        identifier: email,
-        password,
-      });
+      const result = await withTimeout(
+        clerkSignIn.create({
+          identifier: email,
+          password,
+        }),
+        15000
+      );
       if (result.status === "complete" && result.createdSessionId) {
         await setSignInActive!({ session: result.createdSessionId });
       }
