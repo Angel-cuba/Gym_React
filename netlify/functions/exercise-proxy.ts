@@ -1,12 +1,16 @@
 import type { Context } from "@netlify/functions";
 
 const EXERCISE_DB_BASE = "https://oss.exercisedb.dev/api/v1";
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 1500;
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export default async (req: Request, context: Context) => {
   if (req.method === "OPTIONS") {
@@ -23,14 +27,21 @@ export default async (req: Request, context: Context) => {
   const upstream = `${EXERCISE_DB_BASE}/${path}${qs}`;
 
   try {
-    const res = await fetch(upstream);
-    const body = await res.text();
+    let res: Response | null = null;
+
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      res = await fetch(upstream);
+      if (res.status !== 429) break;
+      if (attempt < MAX_RETRIES) await sleep(RETRY_DELAY_MS * (attempt + 1));
+    }
+
+    const body = await res!.text();
 
     return new Response(body, {
-      status: res.status,
+      status: res!.status,
       headers: {
         ...cors,
-        "Content-Type": res.headers.get("content-type") || "application/json",
+        "Content-Type": res!.headers.get("content-type") || "application/json",
         "Cache-Control": "public, max-age=3600",
       },
     });

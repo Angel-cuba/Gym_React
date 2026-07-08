@@ -32,7 +32,8 @@ export const LoginModal = ({ isOpen, onClose }: Props) => {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const [code, setCode] = useState("");
+  const { signIn, signUp, verifyCode } = useAuth();
 
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -50,6 +51,7 @@ export const LoginModal = ({ isOpen, onClose }: Props) => {
     setEmail("");
     setPassword("");
     setName("");
+    setCode("");
     setError("");
     setSubmitting(false);
     setConfirmed(false);
@@ -118,15 +120,38 @@ export const LoginModal = ({ isOpen, onClose }: Props) => {
               </div>
 
               {confirmed ? (
-                <div className="auth-confirm">
+                <form className="auth-form" onSubmit={async (e) => {
+                  e.preventDefault();
+                  setError("");
+                  setSubmitting(true);
+                  const { error: err } = await verifyCode(code);
+                  setSubmitting(false);
+                  if (err) { setError(err.message); return; }
+                  handleClose();
+                }}>
                   <p className="auth-confirm__sub">
-                    Enviamos un enlace a <strong>{email}</strong>.<br />
-                    Confirma tu cuenta y luego entra.
+                    Enviamos un código a <strong>{email}</strong>.<br />
+                    Ingrésalo para verificar tu cuenta.
                   </p>
-                  <button className="auth-submit" onClick={handleClose}>
-                    Entendido
+                  <div className="auth-field">
+                    <label className="auth-label">Código de verificación</label>
+                    <input
+                      className="auth-input"
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="123456"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      required
+                      autoComplete="one-time-code"
+                      autoFocus
+                    />
+                  </div>
+                  {error && <p className="auth-error">{error}</p>}
+                  <button className="auth-submit" type="submit" disabled={submitting}>
+                    {submitting ? "Verificando..." : "Verificar"}
                   </button>
-                </div>
+                </form>
               ) : (
                 <>
                   <div className="auth-tabs">
@@ -199,6 +224,8 @@ export const LoginModal = ({ isOpen, onClose }: Props) => {
                     </div>
 
                     {error && <p className="auth-error">{error}</p>}
+
+                    <div id="clerk-captcha" />
 
                     <button className="auth-submit" type="submit" disabled={submitting}>
                       {submitting
