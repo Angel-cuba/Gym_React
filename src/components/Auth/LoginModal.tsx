@@ -225,8 +225,6 @@ export const LoginModal = ({ isOpen, onClose }: Props) => {
 
                     {error && <p className="auth-error">{error}</p>}
 
-                    <div id="clerk-captcha" />
-
                     <button className="auth-submit" type="submit" disabled={submitting}>
                       {submitting
                         ? "Cargando..."

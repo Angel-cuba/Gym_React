@@ -71,7 +71,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return { error: null, needsConfirmation: false };
       }
 
-      await clerkSignUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      try {
+        await clerkSignUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      } catch {
+        await clerkSignUp.prepareEmailAddressVerification({
+          strategy: "email_link",
+          redirectUrl: window.location.origin,
+        });
+      }
       return { error: null, needsConfirmation: true };
     } catch (err) {
       return { error: extractClerkError(err), needsConfirmation: false };

@@ -59,6 +59,7 @@ function AppContent() {
         <Footer />
       </Box>
       <LoginModal isOpen={loginModalOpen} onClose={closeLoginModal} />
+      <div id="clerk-captcha" />
     </>
   );
 }

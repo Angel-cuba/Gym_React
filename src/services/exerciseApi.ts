@@ -8,6 +8,7 @@ const EXERCISE_DB_BASE_URL =
     : "https://oss.exercisedb.dev/api/v1";
 const PAGE_SIZE = 100;
 const MAX_PAGES = 20;
+const PAGE_DELAY_MS = 600;
 
 type ExerciseDbExercise = {
   exerciseId: string;
@@ -68,11 +69,15 @@ const buildPageUrl = (cursor?: string | null): string => {
   return `${EXERCISE_DB_BASE_URL}/exercises?${params.toString()}`;
 };
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 const fetchExerciseCatalog = async (): Promise<Exercise[] | null> => {
   const exercises: Exercise[] = [];
   let cursor: string | null | undefined;
 
   for (let page = 0; page < MAX_PAGES; page += 1) {
+    if (page > 0) await sleep(PAGE_DELAY_MS);
+
     const response = await fetchData<ExerciseDbResponse>(buildPageUrl(cursor), {
       method: "GET",
     });
