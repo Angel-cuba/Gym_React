@@ -2,7 +2,10 @@ import { fallbackExercises } from "../data/fallbackExercises";
 import { Exercise } from "../types/exercises.types";
 import { fetchData } from "../utils/fetchData";
 
-const EXERCISE_DB_BASE_URL = "https://oss.exercisedb.dev/api/v1";
+const EXERCISE_DB_BASE_URL =
+  process.env.NODE_ENV === "production"
+    ? "/api/exercises-proxy"
+    : "https://oss.exercisedb.dev/api/v1";
 const PAGE_SIZE = 100;
 const MAX_PAGES = 20;
 
